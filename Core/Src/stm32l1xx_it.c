@@ -55,7 +55,7 @@
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
-
+extern DMA_HandleTypeDef hdma_spi1_tx;
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
@@ -198,6 +198,26 @@ void SysTick_Handler(void)
 /* please refer to the startup file (startup_stm32l1xx.s).                    */
 /******************************************************************************/
 
-/* USER CODE BEGIN 1 */
+/**
+  * @brief This function handles DMA1 channel3 global interrupt.
+  */
+void DMA1_Channel3_IRQHandler(void)
+{
+  /* USER CODE BEGIN DMA1_Channel3_IRQn 0 */
 
+  /* USER CODE END DMA1_Channel3_IRQn 0 */
+  HAL_DMA_IRQHandler(&hdma_spi1_tx);
+  /* USER CODE BEGIN DMA1_Channel3_IRQn 1 */
+
+  /* USER CODE END DMA1_Channel3_IRQn 1 */
+}
+
+/* USER CODE BEGIN 1 */
+#include <stdbool.h>
+extern volatile bool spi_dma_tx_cmp_flag;
+void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi)
+{
+  /* Turn LED2 on: Transfer in transmission/reception process is complete */
+  spi_dma_tx_cmp_flag = true;
+}
 /* USER CODE END 1 */
