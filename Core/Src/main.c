@@ -150,7 +150,7 @@ int main(void)
   lcd_write(&test, 1, LCD_WRITE_TYPE_COMMAND);
 
 
-  HAL_GPIO_WritePin(LCD_POWER_CTL_GPIO_GROUP, LCD_POWER_CTL_GPIO_PIN, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(LCD_POWER_CTL_GPIO_GROUP, LCD_POWER_CTL_GPIO_PIN, GPIO_PIN_RESET);
   HAL_GPIO_WritePin(LCD_SPI_CS_GPIO_GROUP, LCD_SPI_CS_GPIO_PIN, GPIO_PIN_SET);
   HAL_GPIO_WritePin(LCD_RES_GPIO_GROUP, LCD_RES_GPIO_PIN, GPIO_PIN_RESET);
   HAL_Delay(100);
@@ -386,7 +386,6 @@ int main(void)
   while (1)
   {
     /* 工作指示 500ms 常闪 */
-    HAL_Delay(500);
     HAL_GPIO_TogglePin(WORK_GPIO_GROUP, WORK_GPIO_PIN);
     /* USER CODE END WHILE */
 
@@ -413,9 +412,20 @@ int main(void)
       lcd_set_address(0,0,160,128);
       utils_lcd_write_multiple_times((uint8_t*)gImage_5, sizeof(gImage_5));
     }
-    if(count >= 10) count=0;
+    if(count >= 10) {
+      count=0;
+      /* Check and Clear the Wakeup flag */
+      if (__HAL_PWR_GET_FLAG(PWR_FLAG_WU) != RESET)
+      {
+        __HAL_PWR_CLEAR_FLAG(PWR_FLAG_WU);
+      }
+      HAL_PWR_EnableWakeUpPin(PWR_WAKEUP_PIN1);
+      HAL_PWR_EnterSTANDBYMode();
+    }
+    HAL_Delay(500);
 
   }
+
   /* USER CODE END 3 */
 }
 
